@@ -33,7 +33,7 @@ public class LCA : MonoBehaviour
         {
             // La pente inverse d'une arête verticale peut être définie comme 0 ou une autre valeur spéciale
             // Cela nécessite une gestion spécifique lors du calcul des intersections
-            slopeInverse = 0;
+            slopeInverse = float.PositiveInfinity; 
         }
         else
         {
