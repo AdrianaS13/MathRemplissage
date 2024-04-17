@@ -3,6 +3,8 @@ using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Experimental.AI;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class PointHandler : MonoBehaviour
 {
@@ -17,7 +19,11 @@ public class PointHandler : MonoBehaviour
 
     public Casteljau decasteljauScript;
     public Pascal pascalScript;
+    public Fill fill;
     public bool clearOne = false;
+
+    
+    
 
     void Update()
     {
@@ -92,6 +98,7 @@ public class PointHandler : MonoBehaviour
         clearOne = true;
     }
 
+    
     // Méthode pour connecter les points pour former un polygone
     public void ConnectPoints(List<GameObject> currentPoints)
     {
@@ -120,7 +127,9 @@ public class PointHandler : MonoBehaviour
         for (int i = 0; i < currentPoints.Count; i++)
         {
             lineRenderer.SetPosition(i, currentPoints[i].transform.position);
+            Debug.Log("punto " + i + " : " + currentPoints[i].transform.position);
             currentPoints[i].transform.parent = polygonObj.transform; // Faire du point un enfant de l'objet ligne (polygone)
+            fill.paintInPixel(lineRenderer, i);
         }
 
         // Effacer la liste des points pour la prochaine session de dessin
