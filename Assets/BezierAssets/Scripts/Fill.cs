@@ -1,5 +1,7 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 
 public class Fill : MonoBehaviour
@@ -7,8 +9,10 @@ public class Fill : MonoBehaviour
     public int width = 100; // Ancho de la textura
     public int height = 100; // Altura de la textura
     public Color fillColor = Color.white; // Color inicial de la textura
+    public float lineWidth = 0.1f;
     public SpriteRenderer spriteRenderer; // Referencia al componente SpriteRenderer
     public Texture2D texture;
+    public GameObject menuCanvas;
     void Start()
     {
         // Crea una nueva textura con el tamaño especificado
@@ -34,40 +38,61 @@ public class Fill : MonoBehaviour
         // Opcional: ajusta el tamaño del objeto SpriteRenderer para que coincida con el tamaño de la textura
         transform.localScale = new Vector3(texture.width, texture.height, 1);
     }
-
-    public void paintInPixel(LineRenderer lineRenderer, int i)
+    public void ShowMenu()
     {
-
-        // Obtén la posición del Line Renderer (suponiendo que es la posición del primer punto)
-        Vector3 position = lineRenderer.GetPosition(i);
-        Debug.Log("punto line " + i + " : " + position);
-        // Convierte la posición del mundo a coordenadas locales del SpriteRenderer
-        Vector3 localPosition = spriteRenderer.transform.InverseTransformPoint(position);
-
-        Debug.Log("localPosition " + i + " : " + localPosition);
-
-        //Texture2D texture = spriteRenderer.sprite.texture;
-        //int x = (int)localPosition.x;
-        //int y = (int)localPosition.y;
-        //texture.SetPixel(x, y, Color.red);
-        //texture.Apply();
-        // Obtén las dimensiones del SpriteRenderer
-        Vector2 spriteSize = spriteRenderer.sprite.bounds.size;
-
-        // Calcule las coordenadas UV en el rango [0, 1] dentro del SpriteRenderer
-        float uvX = (localPosition.x / spriteSize.x) + 0.5f;
-        float uvY = (localPosition.y / spriteSize.y) + 0.5f;
-
-        // Obtén las dimensiones de la textura del Sprite
-        Vector2 textureSize = new Vector2(spriteRenderer.sprite.texture.width, spriteRenderer.sprite.texture.height);
-
-        // Calcule las coordenadas de píxel en la textura del Sprite
-        int pixelX = Mathf.FloorToInt(uvX * textureSize.x);
-        int pixelY = Mathf.FloorToInt(uvY * textureSize.y);
-
-        // Pinta el píxel en la imagen (asumiendo que la textura es modificable)
-        texture = spriteRenderer.sprite.texture;
-        texture.SetPixel(pixelX, pixelY, Color.red);
-        texture.Apply();
+        menuCanvas.SetActive(true);
     }
+    public void paintInPixels(List<Vector3> points)
+    {
+        // Iteramos sobre cada par de puntos consecutivos
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            // Obtenemos los puntos inicial y final de la línea
+            Vector3 startPoint = points[i];
+            Vector3 endPoint = points[i + 1];
+            DrawLinesPixels(startPoint, endPoint);
+
+        }
+        Vector3 firstPoint = points[0];
+        Vector3 lastPoint = points[points.Count - 1];
+        DrawLinesPixels(firstPoint, lastPoint);
+
+    }
+    public void DrawLinesPixels(Vector3 startPoint, Vector3 endPoint)
+    {
+        // Calculamos la distancia entre los puntos para determinar cuántos píxeles necesitamos interpolar
+        float distance = Vector3.Distance(startPoint, endPoint);
+
+        // Iteramos sobre los píxeles interpolar entre los puntos
+        for (float t = 0; t < distance; t++)
+        {
+            // Interpolamos entre los puntos usando t
+            Vector3 interpolatedPoint = Vector3.Lerp(startPoint, endPoint, t / distance);
+
+            // Convertimos la posición interpolada a coordenadas locales del SpriteRenderer
+            Vector3 localInterpolatedPoint = spriteRenderer.transform.InverseTransformPoint(interpolatedPoint);
+
+            // Obtenemos las dimensiones del SpriteRenderer
+            Vector2 spriteSize = spriteRenderer.sprite.bounds.size;
+
+            // Calculamos las coordenadas UV
+            float uvX = (localInterpolatedPoint.x / spriteSize.x) + 0.5f;
+            float uvY = (localInterpolatedPoint.y / spriteSize.y) + 0.5f;
+
+            // Convertimos las coordenadas UV a coordenadas de píxeles en la textura
+            int pixelX = Mathf.FloorToInt(uvX * spriteRenderer.sprite.texture.width);
+            int pixelY = Mathf.FloorToInt(uvY * spriteRenderer.sprite.texture.height);
+
+            // Pintamos el píxel en la textura
+            Texture2D texture = spriteRenderer.sprite.texture;
+            texture.SetPixel(pixelX, pixelY, Color.red);
+        }
+        // Aplicamos los cambios a la textura
+        spriteRenderer.sprite.texture.Apply();
+    }
+
+    
+    
 }
+
+

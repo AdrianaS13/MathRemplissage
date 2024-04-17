@@ -13,7 +13,7 @@ public class Casteljau : MonoBehaviour
     public Shader lineShader;
     public float stepSize = 0.01f;
     public float stepSizeChangeAmount = 0.001f;
-
+    public Fill fill;
     public bool decasteljau = false;
 
     public void ActivateCasteljau()
@@ -75,6 +75,8 @@ public class Casteljau : MonoBehaviour
         BezierLineRenderer.textureMode = LineTextureMode.Tile;
         BezierLineRenderer.numCapVertices = 10;
         BezierLineRenderer.numCornerVertices = 10;
+
+        fill.paintInPixels(curvePoints);
     }
 
     public void UpdateDecasteljau(List<GameObject> controlPoints, GameObject bezierCurveObj)

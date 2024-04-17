@@ -129,9 +129,10 @@ public class PointHandler : MonoBehaviour
             lineRenderer.SetPosition(i, currentPoints[i].transform.position);
             Debug.Log("punto " + i + " : " + currentPoints[i].transform.position);
             currentPoints[i].transform.parent = polygonObj.transform; // Faire du point un enfant de l'objet ligne (polygone)
-            fill.paintInPixel(lineRenderer, i);
+            //fill.paintInPixel(lineRenderer,i);
+            //fill.paintInPixels(currentPoints);
         }
-
+        //fill.DrawLineOnTexture(currentPoints);
         // Effacer la liste des points pour la prochaine session de dessin
         points.Clear();
     }
