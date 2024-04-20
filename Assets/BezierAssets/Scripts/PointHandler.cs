@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
@@ -17,6 +18,7 @@ public class PointHandler : MonoBehaviour
     private bool isCheckingPolygon = false; // Indique si la vérification des polygones est active
     public List<List<GameObject>> courbes = new List<List<GameObject>>();
 
+    public List<List<Vector3>> courbes1 = new List<List<Vector3>>();
     public Casteljau decasteljauScript;
     public Pascal pascalScript;
     public NewFill drawable;
@@ -67,16 +69,16 @@ public class PointHandler : MonoBehaviour
 
                 if (decasteljauScript.decasteljau)
                 {
-                    decasteljauScript.DrawBezierCurve(polygonPoints, insidePolygon);
+                    decasteljauScript.DrawBezierCurve(polygonPoints, insidePolygon); 
                     decasteljauScript.decasteljau = false;
-                   // DrawPixelsPolygons(polygonPoints);
+                    //DrawPixelsPolygons();
                     print("casteljau function worked");
 
                 } else if (pascalScript.pascal)
                 {
                     pascalScript.DrawCurve(polygonPoints, insidePolygon);
                     pascalScript.pascal = false;
-                    //DrawPixelsPolygons(polygonPoints);
+                    //DrawPixelsPolygons();
                     print("pascal function worked");
                 } else if(clearOne)
                 {
@@ -94,15 +96,17 @@ public class PointHandler : MonoBehaviour
             }
         }
     }
-    public void DrawPixelsPolygons(List<GameObject> polygonPoints)
+    public void DrawPixelsPolygons()
     {
         List<Vector3> controlPoints = new List<Vector3>();
-        for (int i = 0; i < polygonPoints.Count; i++)
+        for (int i = 0; i < courbes1.Count; i++)
         {
-            controlPoints.Add(polygonPoints[i].transform.position);
-
+            for (int j = 0; j < courbes1[i].Count; j++)
+            {
+                controlPoints.Add(courbes1[i][j]);
+            }
+            drawable.paintInPixels(controlPoints);
         }
-        drawable.paintInPixels(controlPoints);
     }
     public void ClearOne()
     {
@@ -163,6 +167,8 @@ public class PointHandler : MonoBehaviour
         lines.Clear();
 
         courbes.Clear();
+
+        courbes1.Clear();
     }
 
     // Méthode pour définir la couleur de dessin actuelle

@@ -169,7 +169,8 @@ public class MatriceOperations : MonoBehaviour
         if (DecasteljauCurveObj != null)
         {
             print("curve present");
-                decasteljauScript.UpdateDecasteljau(newPoly, DecasteljauCurveObj);
+            //decasteljauScript.removeCurve(DecasteljauCurveObj);
+            decasteljauScript.UpdateDecasteljau(newPoly, DecasteljauCurveObj);
                 print("casteljau function worked");
             
         } else

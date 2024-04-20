@@ -1570,18 +1570,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Fill, Assembly-CSharp
-        m_MethodName: startFilling
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 1483318577}
         m_TargetAssemblyTypeName: PointHandler, Assembly-CSharp
         m_MethodName: StartCheckingPolygon
@@ -5113,7 +5101,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   Reset_Canvas_On_Play: 1
-  Reset_Colour: {r: 0, g: 0, b: 0, a: 1}
+  Reset_Colour: {r: 1, g: 1, b: 1, a: 0}
   drawable_texture: {fileID: 0}
   is_filling: 0
   x: 0
@@ -6170,9 +6158,10 @@ MonoBehaviour:
   lineShader: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   stepSize: 0.01
   stepSizeChangeAmount: 0.001
-  fill: {fileID: 0}
   drawable: {fileID: 1265744318}
+  operations: {fileID: 1483318581}
   decasteljau: 0
+  curvePointsList: []
 --- !u!114 &1483318580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6208,6 +6197,7 @@ MonoBehaviour:
   translateButton: {fileID: 1562898136}
   rotateButton: {fileID: 149584584}
   translating: 0
+  isDragging: 0
   translationSpeed: 5
   translationIconPrefab: {fileID: 8121012739771219151, guid: 20589510899bfc545841a96490106555, type: 3}
   translationIconOffset: {x: 5, y: 5, z: 0}

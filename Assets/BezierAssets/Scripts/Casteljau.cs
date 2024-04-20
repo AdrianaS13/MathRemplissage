@@ -14,8 +14,10 @@ public class Casteljau : MonoBehaviour
     public float stepSize = 0.01f;
     public float stepSizeChangeAmount = 0.001f;
     public NewFill drawable;
+    public MatriceOperations operations;
     public bool decasteljau = false;
 
+    public List<Vector3> curvePointsList = new List<Vector3>();
     public void ActivateCasteljau()
     {
         decasteljau = true;
@@ -38,6 +40,7 @@ public class Casteljau : MonoBehaviour
 
     public void DrawBezierCurve(List<GameObject> controlPoints, GameObject parent)
     {
+        
         if (controlPoints.Count < 2)
         {
             Debug.LogError("At least two control points are required for drawing a Bezier curve.");
@@ -54,6 +57,7 @@ public class Casteljau : MonoBehaviour
             float t = i * stepSize;
             Vector3 point = CalculateBezierPoint(t, controlPoints);
             curvePoints.Add(point);
+            curvePointsList.Add(point);
 
         }
 
@@ -76,16 +80,18 @@ public class Casteljau : MonoBehaviour
         BezierLineRenderer.numCapVertices = 10;
         BezierLineRenderer.numCornerVertices = 10;
 
-        //fill.startLCA(curvePoints);
+        pointHandler.courbes1.Add(curvePointsList);
         paintFill(curvePoints);
 
     }
     public void paintFill(List<Vector3> curvePoints)
     {
-
         drawable.paintInPixels(curvePoints);
     }
-
+    public void removeCurve()
+    {
+        pointHandler.courbes1.Remove(curvePointsList);
+    }
     public void UpdateDecasteljau(List<GameObject> controlPoints, GameObject bezierCurveObj)
     {
         if (controlPoints.Count < 2)
@@ -93,18 +99,16 @@ public class Casteljau : MonoBehaviour
             Debug.LogError("At least two control points are required for drawing a Bezier curve.");
             return;
         }
-
         int numPoints = Mathf.CeilToInt(1f / stepSize);
-
+        removeCurve();
         List<Vector3> curvePoints = new List<Vector3>();
-
-
+        
         for (int i = 0; i < numPoints; i++)
         {
             float t = i * stepSize;
             Vector3 point = CalculateBezierPoint(t, controlPoints);
             curvePoints.Add(point);
-
+            
         }
 
         BezierLineRenderer = bezierCurveObj.GetComponent<LineRenderer>();
@@ -126,11 +130,12 @@ public class Casteljau : MonoBehaviour
 
         BezierLineRenderer.sortingOrder = 0;
         drawable.ResetCanvas();
-        //drawable.paintInPixels(curvePoints);
+        //paintFill(curvePoints);
     }
 
     private Vector3 CalculateBezierPoint(float t, List<GameObject> controlPoints)
     {
+        
         int numPoints = controlPoints.Count;
         int lastIndex = numPoints - 1;
 
@@ -140,7 +145,7 @@ public class Casteljau : MonoBehaviour
         {
             controlPositions.Add(controlPoints[i].transform.position);
         }
-
+        
         for (int j = 1; j < numPoints; j++)
         {
             for (int k = 0; k < numPoints - j; k++)

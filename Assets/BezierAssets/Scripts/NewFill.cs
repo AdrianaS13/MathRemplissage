@@ -19,7 +19,6 @@ public class NewFill : MonoBehaviour
     public float minZoom = 1f;
     public float zoomSpeed = 1f;
     public Transform textureTransform;
-    private bool isDragging = false;
     private Vector3 offset;
 
     public static Color Pen_Colour = Color.blue;
@@ -35,7 +34,6 @@ public class NewFill : MonoBehaviour
     Color[] clean_colours_array;
     Color32[] cur_colors;
 
-    bool is_drawing_line = false;
     Vector2 start_point;
     Vector2 end_point;
     Vector2 first_point;
@@ -104,10 +102,7 @@ public class NewFill : MonoBehaviour
         }
         Vector3 firstPoint = points[0];
         Vector3 lastPoint = points[points.Count - 1];
-        //Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //startFill(mousePosition);
         DrawLine(new Vector2(firstPoint.x, firstPoint.y), new Vector2(lastPoint.x, lastPoint.y));
-        //LCAFunction(pts);
 
     }
     public static Vector2Int? PointInsidePoly(List<Vector2Int> v, int maxTry = 100)
@@ -172,22 +167,19 @@ public class NewFill : MonoBehaviour
     {
         cur_colors = drawable_texture.GetPixels32();
         Vector2Int start_pixel = WorldToPixelCoordinates(start);
-        if (!is_drawing_line)
-        {
-            lastPolygonPixelVertices.Add(start_pixel);
-        }
+       
         Vector2Int end_pixel = WorldToPixelCoordinates(end);
 
         DrawLineSimple(start_pixel, end_pixel);
 
         // Ajoute toujours le point final
-        lastPolygonPixelVertices.Add(end_pixel);
+        //lastPolygonPixelVertices.Add(end_pixel);
 
         ApplyMarkedPixelChanges();
 
         // Set the last point as the first point for the next line
         start_point = end;
-        is_drawing_line = true;
+        //is_drawing_line = true;
     }
     public void DrawLineSimple(Vector2Int start_pixel, Vector2Int end_pixel)
     {
@@ -235,42 +227,8 @@ public class NewFill : MonoBehaviour
     {
         return Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
-
     void Update()
     {
-        //float zoomValue = Input.GetAxis("Mouse ScrollWheel");
-
-        //Vector3 zoomPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        //float newSize = mainCamera.orthographicSize - zoomValue * zoomSpeed;
-
-        //newSize = Mathf.Clamp(newSize, minZoom, maxZoom);
-
-        //float newSizeChange = newSize - mainCamera.orthographicSize;
-        //mainCamera.orthographicSize = newSize;
-
-        //mainCamera.transform.position += (zoomPoint - mainCamera.transform.position) * newSizeChange / mainCamera.orthographicSize;
-        x = Convert.ToInt32(WorldToPixelCoordinates(GetMouseWorldPosition()).x);
-        y = Convert.ToInt32(WorldToPixelCoordinates(GetMouseWorldPosition()).y);
-        /*var dbg = InsidePolygon(polygons, x, y);
-        Debug.Log($"{dbg == null} is {dbg}");*/
-        if (Input.GetMouseButtonDown(2))
-        {
-            isDragging = true;
-
-            Vector3 clickPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            offset = textureTransform.position - clickPosition;
-        }
-
-        if (Input.GetMouseButtonUp(2))
-        {
-            isDragging = false;
-        }
-
-        if (isDragging && Input.GetMouseButton(2))
-        {
-            Vector3 mouseWorldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            textureTransform.position = mouseWorldPosition + offset;
-        }
         if (Input.GetMouseButtonDown(0))
         {
 
@@ -282,40 +240,9 @@ public class NewFill : MonoBehaviour
                 fillAlgoInstance.Fill(x, y, InsidePolygon(polygons, x, y));
                 is_filling = false;
             }
-            else
-            {
-                Collider2D hit = Physics2D.OverlapPoint(GetMouseWorldPosition(), Drawing_Layers.value);
-                if (hit != null && hit.transform != null || !IsPointerOverUIObject())
-                {
-                    if (!is_drawing_line)
-                    {
-                        //first_point = GetMouseWorldPosition();
-                        //start_point = first_point;
-                        is_drawing_line = true;
-                    }
-                    else
-                    {
-                        end_point = GetMouseWorldPosition();
-                        //DrawLine(start_point, end_point);
-                    }
-                }
-            }
-
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            if (is_drawing_line)
-            {
-                end_point = first_point;
-                //DrawLine(start_point, end_point);
-                is_drawing_line = false;
-                if (lastPolygonPixelVertices.Count >= 3)
-                    polygons.Add(new List<Vector2Int>(lastPolygonPixelVertices));
-                lastPolygonPixelVertices.Clear();
-            }
         }
     }
+   
     //public abstract void FillPolygon(List<Vector2Int> polygonToFill);
     protected static List<Vector2Int> InsidePolygon(List<List<Vector2Int>> polys, int x, int y)
     {
@@ -330,16 +257,7 @@ public class NewFill : MonoBehaviour
         for (int i = 0; i < n; i++)
         {
             Vector2 v1 = polygon[i] - point;
-            Vector2 v2 = polygon[(i + 1) % n] - point;
-
-            /*float dot = Vector2.Dot(v1, v2);
-            float magV1 = v1.magnitude;
-            float magV2 = v2.magnitude;
-            float cosTheta = dot / (magV1 * magV2);
-
-            // Avoid division by zero in case of coincident points
-            if (magV1 == 0 || magV2 == 0)
-                return false;*/
+            Vector2 v2 = polygon[(i + 1) % n] - point;           
 
             float angle = Vector2.SignedAngle(v1, v2);
             Debug.Log("Angle i : " + angle + ", ind " + i);

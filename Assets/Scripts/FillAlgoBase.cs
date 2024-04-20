@@ -35,7 +35,7 @@ public abstract class FillAlgoBase : DrawingRelatedAlgo
         {
             if (polygon == null)
                 return false;
-            var pointInside = Drawing.PointInsidePoly(polygon,1000);
+            var pointInside = NewFill.PointInsidePoly(polygon,1000);
             if (!pointInside.HasValue)
                 return false;
             x = pointInside.Value.x;

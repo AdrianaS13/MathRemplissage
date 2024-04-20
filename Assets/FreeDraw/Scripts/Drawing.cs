@@ -104,10 +104,6 @@ public class Drawing : MonoBehaviour
         }
         Vector3 firstPoint = points[0];
         Vector3 lastPoint = points[points.Count - 1];
-        //Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //startFill(mousePosition);
-        //DrawLinesPixels(firstPoint, lastPoint);
-        //LCAFunction(pts);
 
     }
     public static Vector2Int? PointInsidePoly(List<Vector2Int> v, int maxTry = 100)
