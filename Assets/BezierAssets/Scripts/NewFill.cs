@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Random = UnityEngine.Random;
 
-public class Drawing : MonoBehaviour
+public class NewFill : MonoBehaviour
 {
 
     public List<Vector2Int> lastPolygonPixelVertices = new List<Vector2Int>();
@@ -28,7 +29,7 @@ public class Drawing : MonoBehaviour
     public bool Reset_Canvas_On_Play = true;
     public Color Reset_Colour = new Color(0, 0, 0, 0);
 
-    public static Drawing drawable;
+    public static NewFill drawable;
     Sprite drawable_sprite;
     public Texture2D drawable_texture;
     Color[] clean_colours_array;
@@ -84,7 +85,6 @@ public class Drawing : MonoBehaviour
     }
     public void paintInPixels(List<Vector3> points)
     {
-        Debug.Log("Entra1");
         List<Vector2Int> pts1 = new List<Vector2Int>();
         // Iteramos sobre cada par de puntos consecutivos
         for (int i = 0; i < points.Count - 1; i++)
@@ -106,7 +106,7 @@ public class Drawing : MonoBehaviour
         Vector3 lastPoint = points[points.Count - 1];
         //Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         //startFill(mousePosition);
-        //DrawLinesPixels(firstPoint, lastPoint);
+        DrawLine(new Vector2(firstPoint.x, firstPoint.y), new Vector2(lastPoint.x, lastPoint.y));
         //LCAFunction(pts);
 
     }
@@ -170,7 +170,6 @@ public class Drawing : MonoBehaviour
     // Function to draw a line between two points
     void DrawLine(Vector2 start, Vector2 end)
     {
-        Debug.Log("Entra2");
         cur_colors = drawable_texture.GetPixels32();
         Vector2Int start_pixel = WorldToPixelCoordinates(start);
         if (!is_drawing_line)
@@ -290,14 +289,14 @@ public class Drawing : MonoBehaviour
                 {
                     if (!is_drawing_line)
                     {
-                        first_point = GetMouseWorldPosition();
-                        start_point = first_point;
+                        //first_point = GetMouseWorldPosition();
+                        //start_point = first_point;
                         is_drawing_line = true;
                     }
                     else
                     {
                         end_point = GetMouseWorldPosition();
-                        DrawLine(start_point, end_point);
+                        //DrawLine(start_point, end_point);
                     }
                 }
             }
@@ -309,7 +308,7 @@ public class Drawing : MonoBehaviour
             if (is_drawing_line)
             {
                 end_point = first_point;
-                DrawLine(start_point, end_point);
+                //DrawLine(start_point, end_point);
                 is_drawing_line = false;
                 if (lastPolygonPixelVertices.Count >= 3)
                     polygons.Add(new List<Vector2Int>(lastPolygonPixelVertices));

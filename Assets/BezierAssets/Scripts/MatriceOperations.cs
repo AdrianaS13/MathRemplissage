@@ -24,7 +24,7 @@ public class MatriceOperations : MonoBehaviour
     public float translationSpeed = 5f;
     private GameObject translationIconInstance;
     public GameObject translationIconPrefab; 
-    public Vector3 translationIconOffset = new Vector3(5f, 5f, 0f);
+    public Vector3 translationIconOffset = new Vector3(0f, 0f, 0f);
 
     public PointHandler pointHandler;
 

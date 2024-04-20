@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public abstract class DrawingRelatedAlgo : MonoBehaviour
 {
-    [SerializeField] protected Drawing _drawer;
+    [SerializeField] protected NewFill _drawer;
     [SerializeField] Button _button;
     protected static Color _additionnalDrawingColor = new Color32(113, 113, 113, 255);
     

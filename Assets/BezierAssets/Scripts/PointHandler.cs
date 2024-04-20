@@ -19,10 +19,8 @@ public class PointHandler : MonoBehaviour
 
     public Casteljau decasteljauScript;
     public Pascal pascalScript;
-    public Fill fill;
-    public bool clearOne = false;
-
-    
+    public NewFill drawable;
+    public bool clearOne = false;   
     
 
     void Update()
@@ -71,27 +69,40 @@ public class PointHandler : MonoBehaviour
                 {
                     decasteljauScript.DrawBezierCurve(polygonPoints, insidePolygon);
                     decasteljauScript.decasteljau = false;
+                   // DrawPixelsPolygons(polygonPoints);
                     print("casteljau function worked");
 
                 } else if (pascalScript.pascal)
                 {
                     pascalScript.DrawCurve(polygonPoints, insidePolygon);
                     pascalScript.pascal = false;
+                    //DrawPixelsPolygons(polygonPoints);
                     print("pascal function worked");
                 } else if(clearOne)
                 {
                     Destroy(insidePolygon);
                     clearOne = false;
-                    lines.Remove(insidePolygon); 
+                    lines.Remove(insidePolygon);
+                    drawable.ResetCanvas();
                     //need to add : delete the polygon from 'courbes'
                     print("cleared one polygon");
-                } 
+                }                
             }
             else
             {
                 Debug.Log("Clic à l'extérieur de tous les polygones.");
             }
         }
+    }
+    public void DrawPixelsPolygons(List<GameObject> polygonPoints)
+    {
+        List<Vector3> controlPoints = new List<Vector3>();
+        for (int i = 0; i < polygonPoints.Count; i++)
+        {
+            controlPoints.Add(polygonPoints[i].transform.position);
+
+        }
+        drawable.paintInPixels(controlPoints);
     }
     public void ClearOne()
     {
@@ -129,8 +140,7 @@ public class PointHandler : MonoBehaviour
             lineRenderer.SetPosition(i, currentPoints[i].transform.position);
             Debug.Log("punto " + i + " : " + currentPoints[i].transform.position);
             currentPoints[i].transform.parent = polygonObj.transform; // Faire du point un enfant de l'objet ligne (polygone)
-            //fill.paintInPixel(lineRenderer,i);
-            //fill.paintInPixels(currentPoints);
+            
         }
         //fill.DrawLineOnTexture(currentPoints);
         // Effacer la liste des points pour la prochaine session de dessin

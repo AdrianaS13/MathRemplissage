@@ -13,7 +13,7 @@ public class Casteljau : MonoBehaviour
     public Shader lineShader;
     public float stepSize = 0.01f;
     public float stepSizeChangeAmount = 0.001f;
-    public Fill fill;
+    public NewFill drawable;
     public bool decasteljau = false;
 
     public void ActivateCasteljau()
@@ -70,13 +70,20 @@ public class Casteljau : MonoBehaviour
 
         BezierLineRenderer.material = lineMaterial;
 
-        BezierLineRenderer.startWidth = 0.3f;
-        BezierLineRenderer.endWidth = 0.3f;
+        BezierLineRenderer.startWidth = 0.1f;
+        BezierLineRenderer.endWidth = 0.1f;
         BezierLineRenderer.textureMode = LineTextureMode.Tile;
         BezierLineRenderer.numCapVertices = 10;
         BezierLineRenderer.numCornerVertices = 10;
 
-        fill.paintInPixels(curvePoints);
+        //fill.startLCA(curvePoints);
+        paintFill(curvePoints);
+
+    }
+    public void paintFill(List<Vector3> curvePoints)
+    {
+
+        drawable.paintInPixels(curvePoints);
     }
 
     public void UpdateDecasteljau(List<GameObject> controlPoints, GameObject bezierCurveObj)
@@ -111,13 +118,15 @@ public class Casteljau : MonoBehaviour
 
         BezierLineRenderer.material = lineMaterial;
 
-        BezierLineRenderer.startWidth = 0.3f;
-        BezierLineRenderer.endWidth = 0.3f;
+        BezierLineRenderer.startWidth = 0.1f;
+        BezierLineRenderer.endWidth = 0.1f;
         BezierLineRenderer.textureMode = LineTextureMode.Tile;
         BezierLineRenderer.numCapVertices = 10;
         BezierLineRenderer.numCornerVertices = 10;
 
         BezierLineRenderer.sortingOrder = 0;
+        drawable.ResetCanvas();
+        //drawable.paintInPixels(curvePoints);
     }
 
     private Vector3 CalculateBezierPoint(float t, List<GameObject> controlPoints)
