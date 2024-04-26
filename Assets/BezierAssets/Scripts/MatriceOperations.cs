@@ -24,7 +24,7 @@ public class MatriceOperations : MonoBehaviour
     public float translationSpeed = 5f;
     private GameObject translationIconInstance;
     public GameObject translationIconPrefab; 
-    public Vector3 translationIconOffset = new Vector3(5f, 5f, 0f);
+    public Vector3 translationIconOffset = new Vector3(0.5f, 0.5f, 0.5f);
 
     public PointHandler pointHandler;
 
@@ -74,6 +74,7 @@ public class MatriceOperations : MonoBehaviour
 
         if (translating)
         {
+            pointHandler.drawable.ResetCanvas();
             if (Input.GetMouseButton(0) && selectedObject != null)
             {
                 Vector3 currentMousePosition = Input.mousePosition;
@@ -131,11 +132,11 @@ public class MatriceOperations : MonoBehaviour
             // Show translation icon above the selected object
             if (translationIconPrefab != null && translationIconInstance == null)
             {
-                translationIconInstance = Instantiate(translationIconPrefab, selectedObject.transform.position + translationIconOffset, Quaternion.identity);
+                translationIconInstance = Instantiate(translationIconPrefab, selectedObject.transform.position /*+ translationIconOffset*/, Quaternion.identity);
             }
             else if (translationIconInstance != null)
             {
-                translationIconInstance.transform.position = selectedObject.transform.position + translationIconOffset;
+                translationIconInstance.transform.position = selectedObject.transform.position /*+ translationIconOffset*/;
             }
         }
 

@@ -19,6 +19,7 @@ public class Drawing : MonoBehaviour
     public float zoomSpeed = 1f;
     public Transform textureTransform;
     private bool isDragging = false;
+    public bool isDrawingPixel = false;
     private Vector3 offset;
 
     public static Color Pen_Colour = Color.blue;
@@ -36,12 +37,15 @@ public class Drawing : MonoBehaviour
 
     bool is_drawing_line = false;
     Vector2 start_point;
+    Vector2Int start_point1;
     Vector2 end_point;
     Vector2 first_point;
     public bool is_filling = false;
     public int x = 0;
     public int y = 0;
     public DrawingRelatedAlgo fillAlgoInstance;
+
+    public List<List<Vector2Int>> pts = new List<List<Vector2Int>>();
     // Method to set pen brush color to red
     public void SetPenBrushRed()
     {
@@ -79,6 +83,45 @@ public class Drawing : MonoBehaviour
         {
             fillAlgoInstance.Fill(-1, -1, poly);
         }
+    }
+    public void paintInPixels(List<Vector3> points)
+    {
+        List<Vector2Int> pts1 = new List<Vector2Int>();
+        // Iteramos sobre cada par de puntos consecutivos
+        for (int i = 0; i < points.Count; i++)
+        {
+            float x = points[i].x;
+            float y = points[i].y;
+            Vector2Int pixel = WorldToPixelCoordinates(new Vector2(x, y));
+            pts1.Add(pixel);
+
+        }
+        pts.Add(pts1);
+    }
+    public void paintPolygonsInPixels(List<Vector3> points)
+    {
+        // Iteramos sobre cada par de puntos consecutivos
+        //for (int i = 0; i < points.Count; i++)
+        //{
+        //    float x = points[i].x;
+        //    float y = points[i].y;
+        //    Vector2Int pixel = WorldToPixelCoordinates(new Vector2(x, y));
+        //    lastPolygonPixelVertices.Add(pixel);
+
+        //}
+        //polygons.Add(lastPolygonPixelVertices);
+    }
+    void DrawCurve(Vector2 start, Vector2 end)
+    {
+        cur_colors = drawable_texture.GetPixels32();
+        Vector2Int start_pixel = WorldToPixelCoordinates(start);        
+        Vector2Int end_pixel = WorldToPixelCoordinates(end);
+        
+        DrawLineSimple(start_pixel, end_pixel);
+        ApplyMarkedPixelChanges();
+
+        //start_point = end;
+        is_drawing_line = true;
     }
     public static Vector2Int? PointInsidePoly(List<Vector2Int> v, int maxTry = 100)
     {
@@ -138,9 +181,8 @@ public class Drawing : MonoBehaviour
     }
 
     // Function to draw a line between two points
-    void DrawLine(Vector2 start, Vector2 end)
+    public void DrawLine(Vector2 start, Vector2 end)
     {
-
         cur_colors = drawable_texture.GetPixels32();
         Vector2Int start_pixel = WorldToPixelCoordinates(start);
         if (!is_drawing_line)
@@ -149,16 +191,50 @@ public class Drawing : MonoBehaviour
         }
         Vector2Int end_pixel = WorldToPixelCoordinates(end);
 
-        DrawLineSimple(start_pixel, end_pixel);
+        //DrawLineSimple(start_pixel, end_pixel);
 
         // Ajoute toujours le point final
         lastPolygonPixelVertices.Add(end_pixel);
-
-        ApplyMarkedPixelChanges();
+        //ApplyMarkedPixelChanges();
 
         // Set the last point as the first point for the next line
         start_point = end;
         is_drawing_line = true;
+    }
+    public void drawEverything()
+    {
+        ResetCanvas();
+        isDrawingPixel = true;
+        
+        /*for (int i = 0; i < polygons.Count; i++)
+        {
+            Debug.Log("polygons.Count" + polygons.Count);
+            for (int j = 0; j < polygons[i].Count-1; j++)
+            {
+                Vector2Int point1 = polygons[i][j];
+                Vector2Int point2 = polygons[i][j+1];
+                //end_point = point2;
+                DrawLineSimple(point1, point2);
+                //ApplyMarkedPixelChanges();
+            }
+            //DrawLineSimple(polygons[i][0], end_point);
+            //ApplyMarkedPixelChanges();
+        }*/
+
+        for (int i = 0; i < pts.Count; i++)
+        {
+            Debug.Log("pts.Count " + pts.Count);
+            for (int j = 0; j < pts[i].Count - 1; j++)
+            {
+                Vector2Int point1 = pts[i][j];
+                Vector2Int point2 = pts[i][j + 1];
+                start_point1 = point2;
+                DrawLineSimple(point1, point2);
+                //ApplyMarkedPixelChanges();
+            }
+            DrawLineSimple(pts[i][0], start_point1);
+            //ApplyMarkedPixelChanges();
+        }
     }
     public void DrawLineSimple(Vector2Int start_pixel, Vector2Int end_pixel)
     {
@@ -174,6 +250,7 @@ public class Drawing : MonoBehaviour
             Vector2Int pixel = start_pixel + (delta * i / steps);
             MarkPixelToChange(pixel.x, pixel.y, Pen_Colour);
         }
+        ApplyMarkedPixelChanges();
     }
 
     // Function to apply marked pixel changes to the texture
@@ -222,8 +299,8 @@ public class Drawing : MonoBehaviour
         mainCamera.transform.position += (zoomPoint - mainCamera.transform.position) * newSizeChange / mainCamera.orthographicSize;
         x = Convert.ToInt32(WorldToPixelCoordinates(GetMouseWorldPosition()).x);
         y = Convert.ToInt32(WorldToPixelCoordinates(GetMouseWorldPosition()).y);
-        /*var dbg = InsidePolygon(polygons, x, y);
-        Debug.Log($"{dbg == null} is {dbg}");*/
+        //var dbg = InsidePolygon(polygons, x, y);
+        //Debug.Log($"{dbg == null} is {dbg}");
         if (Input.GetMouseButtonDown(2))
         {
             isDragging = true;
@@ -332,15 +409,20 @@ public class Drawing : MonoBehaviour
     // Function to reset the canvas
     public void ResetCanvas()
     {
-        polygons.Clear();
         drawable_texture.SetPixels(clean_colours_array);
         drawable_texture.Apply();
     }
-
+    public void ClearCanvas()
+    {
+        lastPolygonPixelVertices.Clear();
+        polygons.Clear();
+        pts.Clear();
+        drawable_texture.SetPixels(clean_colours_array);
+        drawable_texture.Apply();
+    }
     void Awake()
     {
         drawable = this;
-
         drawable_sprite = this.GetComponent<SpriteRenderer>().sprite;
         drawable_texture = drawable_sprite.texture;
         cur_colors = drawable_texture.GetPixels32();

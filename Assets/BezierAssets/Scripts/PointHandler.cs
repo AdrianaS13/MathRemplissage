@@ -17,11 +17,20 @@ public class PointHandler : MonoBehaviour
 
     public Casteljau decasteljauScript;
     public Pascal pascalScript;
+    public Drawing drawable;
     public bool clearOne = false;
 
     public bool isLinking = false;
     public int linkType;
 
+    public List<Vector3> polygonPoints = new List<Vector3>();
+
+    private void Awake()
+    {
+        points.Clear();
+        lines.Clear();
+        polygonPoints.Clear();
+    }
     void Update()
     {
         // Vérifier si le clic gauche de la souris est enfoncé et si le dessin est en cours et que la souris n'est pas sur un objet UI
@@ -45,6 +54,7 @@ public class PointHandler : MonoBehaviour
             List<GameObject> currentPoints = new List<GameObject>(points);
             ConnectPoints(currentPoints); // Connecter les points pour former un polygone
             courbes.Add(currentPoints);
+            //obtainPoints(currentPoints);
         }
 
         // Vérifier si la vérification des polygones est active et si le clic gauche de la souris est enfoncé
@@ -109,6 +119,18 @@ public class PointHandler : MonoBehaviour
             }
         }
     }
+    public void obtainPoints(List<GameObject> currentPoints)
+    {
+        List<Vector2Int> vector2IntList = new List<Vector2Int>();
+
+        foreach (GameObject obj in currentPoints)
+        {
+            Vector3 position = obj.transform.position;
+            Vector2Int vector2IntPosition = new Vector2Int((int)position.x, (int)position.y);
+            vector2IntList.Add(vector2IntPosition);
+        }
+       // drawable.drawEverything(vector2IntList);
+    }
     public void ClearOne()
     {
         clearOne = true;
@@ -143,10 +165,13 @@ public class PointHandler : MonoBehaviour
         {
             lineRenderer.SetPosition(i, currentPoints[i].transform.position);
             currentPoints[i].transform.parent = polygonObj.transform; // Faire du point un enfant de l'objet ligne (polygone)
-        }
 
+            polygonPoints.Add(currentPoints[i].transform.position);
+        }
+        drawable.paintPolygonsInPixels(polygonPoints);
         // Effacer la liste des points pour la prochaine session de dessin
         points.Clear();
+        polygonPoints.Clear();
     }
 
     // Méthode pour effacer tous les points et polygones

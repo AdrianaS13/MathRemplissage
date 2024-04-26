@@ -70,8 +70,8 @@ public class Casteljau : MonoBehaviour
 
         BezierLineRenderer.material = lineMaterial;
 
-        BezierLineRenderer.startWidth = 0.3f;
-        BezierLineRenderer.endWidth = 0.3f;
+        BezierLineRenderer.startWidth = 0.1f;
+        BezierLineRenderer.endWidth = 0.1f;
         BezierLineRenderer.textureMode = LineTextureMode.Tile;
         BezierLineRenderer.numCapVertices = 10;
         BezierLineRenderer.numCornerVertices = 10;
@@ -109,8 +109,8 @@ public class Casteljau : MonoBehaviour
 
         BezierLineRenderer.material = lineMaterial;
 
-        BezierLineRenderer.startWidth = 0.3f;
-        BezierLineRenderer.endWidth = 0.3f;
+        BezierLineRenderer.startWidth = 0.1f;
+        BezierLineRenderer.endWidth = 0.1f;
         BezierLineRenderer.textureMode = LineTextureMode.Tile;
         BezierLineRenderer.numCapVertices = 10;
         BezierLineRenderer.numCornerVertices = 10;
@@ -142,6 +142,7 @@ public class Casteljau : MonoBehaviour
 
     public void clearCurve()
     {
+        pointHandler.drawable.ClearCanvas();
         LineRenderer[] lineRenderers = FindObjectsOfType<LineRenderer>();
 
         foreach (LineRenderer lineRenderer in lineRenderers)
