@@ -38,7 +38,7 @@ public class MatriceOperations : MonoBehaviour
     private void Start()
     {
         translateButton.onClick.AddListener(StartTranslation);
-        rotateButton.onClick.AddListener(StartRotation);
+        //rotateButton.onClick.AddListener(StartRotation);
         HideMenu();
     }
 

@@ -168,7 +168,7 @@ public class PointHandler : MonoBehaviour
 
             polygonPoints.Add(currentPoints[i].transform.position);
         }
-        drawable.paintPolygonsInPixels(polygonPoints);
+        //drawable.paintPolygonsInPixels(polygonPoints);
         // Effacer la liste des points pour la prochaine session de dessin
         points.Clear();
         polygonPoints.Clear();

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Pascal : MonoBehaviour
 {
     public PointHandler controlPoints;
-    public int resolution = 30;
+    public int resolution = 5;
 
     public LineRenderer lineRenderer;
 

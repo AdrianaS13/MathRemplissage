@@ -16,6 +16,7 @@ public class Casteljau : MonoBehaviour
 
     public bool decasteljau = false;
 
+    public List<Vector2> lastcurvePixelVertices = new List<Vector2>();
     public void ActivateCasteljau()
     {
         decasteljau = true;

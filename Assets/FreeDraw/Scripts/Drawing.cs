@@ -96,7 +96,7 @@ public class Drawing : MonoBehaviour
             pts1.Add(pixel);
 
         }
-        pts.Add(pts1);
+        polygons.Add(pts1);
     }
     public void paintPolygonsInPixels(List<Vector3> points)
     {
@@ -113,7 +113,7 @@ public class Drawing : MonoBehaviour
     }
     void DrawCurve(Vector2 start, Vector2 end)
     {
-        cur_colors = drawable_texture.GetPixels32();
+        //cur_colors = drawable_texture.GetPixels32();
         Vector2Int start_pixel = WorldToPixelCoordinates(start);        
         Vector2Int end_pixel = WorldToPixelCoordinates(end);
         
@@ -183,7 +183,7 @@ public class Drawing : MonoBehaviour
     // Function to draw a line between two points
     public void DrawLine(Vector2 start, Vector2 end)
     {
-        cur_colors = drawable_texture.GetPixels32();
+        //cur_colors = drawable_texture.GetPixels32();
         Vector2Int start_pixel = WorldToPixelCoordinates(start);
         if (!is_drawing_line)
         {
@@ -203,25 +203,25 @@ public class Drawing : MonoBehaviour
     }
     public void drawEverything()
     {
-        ResetCanvas();
+        //ResetCanvas();
         isDrawingPixel = true;
         
-        /*for (int i = 0; i < polygons.Count; i++)
+        for (int i = 0; i < polygons.Count; i++)
         {
             Debug.Log("polygons.Count" + polygons.Count);
             for (int j = 0; j < polygons[i].Count-1; j++)
             {
                 Vector2Int point1 = polygons[i][j];
                 Vector2Int point2 = polygons[i][j+1];
-                //end_point = point2;
+                start_point1 = point2;
                 DrawLineSimple(point1, point2);
                 //ApplyMarkedPixelChanges();
             }
-            //DrawLineSimple(polygons[i][0], end_point);
+            DrawLineSimple(polygons[i][0], start_point1);
             //ApplyMarkedPixelChanges();
-        }*/
+        }
 
-        for (int i = 0; i < pts.Count; i++)
+        /*for (int i = 0; i < pts.Count; i++)
         {
             Debug.Log("pts.Count " + pts.Count);
             for (int j = 0; j < pts[i].Count - 1; j++)
@@ -234,7 +234,7 @@ public class Drawing : MonoBehaviour
             }
             DrawLineSimple(pts[i][0], start_point1);
             //ApplyMarkedPixelChanges();
-        }
+        }*/
     }
     public void DrawLineSimple(Vector2Int start_pixel, Vector2Int end_pixel)
     {
@@ -337,32 +337,32 @@ public class Drawing : MonoBehaviour
                 {
                     if (!is_drawing_line)
                     {
-                        first_point = GetMouseWorldPosition();
-                        start_point = first_point;
+                        //first_point = GetMouseWorldPosition();
+                        //start_point = first_point;
                         is_drawing_line = true;
                     }
                     else
                     {
-                        end_point = GetMouseWorldPosition();
-                        DrawLine(start_point, end_point);
+                        //end_point = GetMouseWorldPosition();
+                        //DrawLine(start_point, end_point);
                     }
                 }
             }
 
         }
 
-        if (Input.GetMouseButtonDown(1))
+        /*if (Input.GetMouseButtonDown(1))
         {
             if (is_drawing_line)
             {
                 end_point = first_point;
-                DrawLine(start_point, end_point);
+                //DrawLine(start_point, end_point);
                 is_drawing_line = false;
                 if (lastPolygonPixelVertices.Count >= 3)
                     polygons.Add(new List<Vector2Int>(lastPolygonPixelVertices));
                 lastPolygonPixelVertices.Clear();
             }
-        }
+        }*/
     }
     //public abstract void FillPolygon(List<Vector2Int> polygonToFill);
     protected static List<Vector2Int> InsidePolygon(List<List<Vector2Int>> polys, int x, int y)
@@ -411,6 +411,8 @@ public class Drawing : MonoBehaviour
     {
         drawable_texture.SetPixels(clean_colours_array);
         drawable_texture.Apply();
+
+        cur_colors = drawable_texture.GetPixels32();
     }
     public void ClearCanvas()
     {
@@ -419,6 +421,7 @@ public class Drawing : MonoBehaviour
         pts.Clear();
         drawable_texture.SetPixels(clean_colours_array);
         drawable_texture.Apply();
+        cur_colors = drawable_texture.GetPixels32();
     }
     void Awake()
     {
@@ -432,7 +435,7 @@ public class Drawing : MonoBehaviour
             clean_colours_array[x] = Reset_Colour;
 
         if (Reset_Canvas_On_Play)
-            ResetCanvas();
+            ClearCanvas();
     }
 
 
