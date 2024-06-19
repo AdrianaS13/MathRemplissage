@@ -28,19 +28,16 @@ public class Extrusion : MonoBehaviour
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
-        // Generate vertices
         foreach (Vector3 point in curvePoints)
         {
-            vertices.Add(new Vector3(point.x, point.y, 0)); // Bottom of the extrusion
-            vertices.Add(new Vector3(point.x * scale, point.y * scale, height)); // Top of the extrusion
+            vertices.Add(new Vector3(point.x, point.y, 0)); 
+            vertices.Add(new Vector3(point.x * scale, point.y * scale, height)); 
         }
 
-        // Generate triangles for the side faces
         for (int i = 0; i < curvePoints.Count - 1; i++)
         {
             int baseIndex = i * 2;
 
-            // Adjust the order of vertices to correct the winding
             triangles.Add(baseIndex);
             triangles.Add(baseIndex + 1);
             triangles.Add(baseIndex + 2);
@@ -59,6 +56,7 @@ public class Extrusion : MonoBehaviour
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
         mesh.ManuallyRecalculateNormals();
+
     }
 
     /* void AddCap(List<int> triangles, List<Vector3> vertices, bool isTop)
@@ -74,12 +72,11 @@ public class Extrusion : MonoBehaviour
         }
     } */
 
-    // Méthode pour mettre à jour l'extrusion si nécessaire
+    // Méthode pour mettre à jour l'extrusion 
     public void UpdateExtrusion(List<Vector3> newCurvePoints, Color currentColor, Transform parent)
     {
-        curvePoints = new List<Vector3>(newCurvePoints); // Copy the points to ensure isolation
+        curvePoints = new List<Vector3>(newCurvePoints); 
 
-        // Apply the new color to the material
         if (meshRenderer == null)
         {
             meshRenderer = GetComponent<MeshRenderer>();
@@ -104,7 +101,6 @@ public class Extrusion : MonoBehaviour
         }
         ConfigureLighting();
 
-        // Set the parent
         transform.SetParent(parent);
 
         GenerateMesh();

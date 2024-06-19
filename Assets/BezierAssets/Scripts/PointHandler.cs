@@ -57,21 +57,21 @@ public class PointHandler : MonoBehaviour
         if (isZCurve)
         {
             GameObject curveZGameObject = IsInsidePolygon();
-            // Vérifier si le clic gauche de la souris est enfoncé et si le dessin est en cours et que la souris n'est pas sur un objet UI
+            
             if (Input.GetMouseButtonDown(0) && drawing && !IsPointerOverUIObject())
             {
                 // Obtenir la position de la souris dans l'espace du monde
                 Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 //mousePos.y = 0f; // S'assurer que la coordonnée z est 0 pour l'espace 2D
 
-                // Instancier un objet point à la position de la souris
+                //Instancier un objet point à la position de la souris
                 GameObject point = Instantiate(pointPrefab, mousePos, Quaternion.identity);
                 point.tag = "controlPoint";
                 point.GetComponent<Renderer>().material.color = currentColor; // Définir la couleur du point
                 pointsZ.Add(point); // Ajouter le point à la liste
             }
 
-            // Vérifier si le clic droit de la souris est enfoncé et si le dessin est en cours
+            
             if (Input.GetMouseButtonDown(1) && drawing)
             {
                 drawing = false; // Arrêter le dessin
@@ -98,7 +98,7 @@ public class PointHandler : MonoBehaviour
         }
         else
         {
-            // Vérifier si le clic gauche de la souris est enfoncé et si le dessin est en cours et que la souris n'est pas sur un objet UI
+            
             if (Input.GetMouseButtonDown(0) && drawing && !IsPointerOverUIObject())
             {
                 // Obtenir la position de la souris dans l'espace du monde
@@ -112,7 +112,7 @@ public class PointHandler : MonoBehaviour
                 points.Add(point); // Ajouter le point à la liste
             }
 
-            // Vérifier si le clic droit de la souris est enfoncé et si le dessin est en cours
+            
             if (Input.GetMouseButtonDown(1) && drawing)
             {
                 drawing = false; // Arrêter le dessin
@@ -122,7 +122,6 @@ public class PointHandler : MonoBehaviour
             }
 
 
-            // Vérifier si la vérification des polygones est active et si le clic gauche de la souris est enfoncé
             if (isCheckingPolygon && Input.GetMouseButtonDown(0) && !IsPointerOverUIObject())
             {
                 isCheckingPolygon = false;
@@ -218,7 +217,6 @@ public class PointHandler : MonoBehaviour
                 {
                     if (isRevExtruding)
                     {
-                        // Vérifier si le clic gauche de la souris est enfoncé et si le dessin est en cours et que la souris n'est pas sur un objet UI
                         if (Input.GetMouseButtonDown(0) && !isChoosingAxis && !IsPointerOverUIObject())
                         {
                             // Obtenir la position de la souris dans l'espace du monde
@@ -336,21 +334,17 @@ public class PointHandler : MonoBehaviour
         lineRenderer.endWidth = 0.02f;
         lineRenderer.loop = true; // Relier le dernier point au premier point
 
-        // Définir la couleur de la ligne pour correspondre à la couleur des points
         lineRenderer.material.color = currentColor;
 
-        // Définir les positions pour le LineRenderer
         for (int i = 0; i < currentPoints.Count; i++)
         {
             lineRenderer.SetPosition(i, currentPoints[i].transform.position);
             currentPoints[i].transform.parent = polygonObj.transform; // Faire du point un enfant de l'objet ligne (polygone)
         }
 
-        // Effacer la liste des points pour la prochaine session de dessin
         points.Clear();
     }
 
-    // Méthode pour effacer tous les points et polygones
     public void Clear()
     {
         foreach (GameObject point in points)
@@ -368,7 +362,6 @@ public class PointHandler : MonoBehaviour
         courbes.Clear();
     }
 
-    // Méthode pour définir la couleur de dessin actuelle
     public void SetColorRed()
     {
         currentColor = Color.red;
