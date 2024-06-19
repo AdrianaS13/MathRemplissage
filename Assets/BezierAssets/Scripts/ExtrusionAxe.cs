@@ -15,7 +15,7 @@ public class ExtrusionAxe : MonoBehaviour
         meshRenderer = GetComponent<MeshRenderer>();
     }
 
-    public void ExtrudeSurAxe(List<Vector3> curve, Transform parent, Color currentColor)
+    public void ExtrudeSurAxe(List<Vector3> curve, Transform parent, Vector3 axis, Color currentColor)
     {
         if (curve == null || curve.Count < 2)
         {
@@ -25,10 +25,10 @@ public class ExtrusionAxe : MonoBehaviour
 
         MeshFilter meshFilter = GetComponent<MeshFilter>();
         transform.SetParent(parent);
-        meshFilter.mesh = CreateRevolvedMesh(curve, segmentCount, currentColor);
+        meshFilter.mesh = CreateRevolvedMesh(curve, segmentCount, axis, currentColor);
     }
 
-    public Mesh CreateRevolvedMesh(List<Vector3> curve, int segments, Color currentColor)
+    public Mesh CreateRevolvedMesh(List<Vector3> curve, int segments, Vector3 axisPosition, Color currentColor)
     {
         int curvePointCount = curve.Count;
         int verticesCount = curvePointCount * (segments + 1);
@@ -37,7 +37,7 @@ public class ExtrusionAxe : MonoBehaviour
         int[] triangles = new int[segments * (curvePointCount - 1) * 6];
         Vector2[] uvs = new Vector2[verticesCount];
 
-        // Crear vértices
+        // Create vertices
         for (int i = 0; i <= segments; i++)
         {
             float angle = (float)i / segments * Mathf.PI * 2f;
@@ -47,15 +47,40 @@ public class ExtrusionAxe : MonoBehaviour
             {
                 Vector3 point = curve[j];
                 int vertexIndex = i * curvePointCount + j;
-                vertices[vertexIndex] = rotation * point;
+
+                // Translate point to the origin, rotate, then translate back
+                Vector3 translatedPoint = point - axisPosition;
+                Vector3 rotatedPoint = rotation * translatedPoint;
+                vertices[vertexIndex] = rotatedPoint + axisPosition;
+
                 uvs[vertexIndex] = new Vector2((float)i / segments, (float)j / (curvePointCount - 1));
+            }
+        }
+
+        // Create triangles with correct winding order
+        int triIndex = 0;
+        for (int i = 0; i < segments; i++)
+        {
+            for (int j = 0; j < curvePointCount - 1; j++)
+            {
+                int start = i * curvePointCount + j;
+                int next = (i + 1) * curvePointCount + j;
+
+                // Correct winding order
+                triangles[triIndex++] = start;
+                triangles[triIndex++] = start + 1;
+                triangles[triIndex++] = next;
+
+                triangles[triIndex++] = next;
+                triangles[triIndex++] = start + 1;
+                triangles[triIndex++] = next + 1;
             }
         }
 
         Mesh mesh = new Mesh();
         mesh.vertices = vertices;
         mesh.uv = uvs;
-        mesh.triangles = new int[0]; // Initially, no triangles
+        mesh.triangles = triangles;
         mesh.ManuallyRecalculateNormals();
 
         // Apply the new color to the material
@@ -63,7 +88,6 @@ public class ExtrusionAxe : MonoBehaviour
         {
             meshRenderer = GetComponent<MeshRenderer>();
         }
-        //meshRenderer.material.color = currentColor;
 
         if (PointHandler.setMaterialWood)
         {
@@ -78,13 +102,15 @@ public class ExtrusionAxe : MonoBehaviour
             Material material = new Material(Shader.Find("Standard"));
             material.mainTexture = texture;
             meshRenderer.material = material;
-        } else
+        }
+        else
         {
             meshRenderer.material.color = currentColor;
         }
 
         return mesh;
     }
+
 
     void ConfigureLighting()
     {
@@ -133,9 +159,9 @@ public class ExtrusionAxe : MonoBehaviour
         }
     }
 
-    public void StartAnimation(List<Vector3> curve, int segments, Color currentColor, int speed)
+    public void StartAnimation(List<Vector3> curve, int segments, Vector3 axis, Color currentColor, int speed)
     {
-        Mesh mesh = CreateRevolvedMesh(curve, segments, currentColor);
+        Mesh mesh = CreateRevolvedMesh(curve, segments, axis, currentColor);
         GetComponent<MeshFilter>().mesh = mesh;
         StartCoroutine(AnimateTriangles(mesh, curve, segments, speed));
     }

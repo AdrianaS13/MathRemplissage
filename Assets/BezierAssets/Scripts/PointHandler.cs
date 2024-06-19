@@ -49,12 +49,13 @@ public class PointHandler : MonoBehaviour
     [SerializeField] private Image noneBorder;
 
     private bool curveZwithoutR = false;
+    public Vector3 axisPosition = Vector3.zero;
+    private bool isChoosingAxis = false;
 
     void Update()
     {
         if (isZCurve)
         {
-            Debug.Log("CurveZ");
             GameObject curveZGameObject = IsInsidePolygon();
             // Vérifier si le clic gauche de la souris est enfoncé et si le dessin est en cours et que la souris n'est pas sur un objet UI
             if (Input.GetMouseButtonDown(0) && drawing && !IsPointerOverUIObject())
@@ -173,12 +174,19 @@ public class PointHandler : MonoBehaviour
                     }
                     else if (isRevExtruding)
                     {
-                        List<Vector3> curvePoints = decasteljauScript.decasteljau ?
-                            decasteljauScript.GetCurvePoints(polygonPoints) :
-                            pascalScript.GetCurvePoints(polygonPoints);
+                        if (isChoosingAxis)
+                        {
+                            Debug.Log("Revolve");
+                            List<Vector3> curvePoints = decasteljauScript.decasteljau ?
+                                decasteljauScript.GetCurvePoints(polygonPoints) :
+                                pascalScript.GetCurvePoints(polygonPoints);
 
-                        decasteljauScript.DrawBezierCurve(polygonPoints, insidePolygon);
-                        CreateExtrusionAxe(curvePoints, insidePolygon.transform);
+                            decasteljauScript.DrawBezierCurve(polygonPoints, insidePolygon);
+                            CreateExtrusionAxe(curvePoints, insidePolygon.transform, axisPosition);
+
+                            isChoosingAxis = false;
+                        }
+
                     }
                     else if (isLinking)
                     {
@@ -208,6 +216,20 @@ public class PointHandler : MonoBehaviour
                 }
                 else
                 {
+                    if (isRevExtruding)
+                    {
+                        // Vérifier si le clic gauche de la souris est enfoncé et si le dessin est en cours et que la souris n'est pas sur un objet UI
+                        if (Input.GetMouseButtonDown(0) && !isChoosingAxis && !IsPointerOverUIObject())
+                        {
+                            // Obtenir la position de la souris dans l'espace du monde
+                            axisPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                            axisPosition.z = 0f; // S'assurer que la coordonnée z est 0 pour l'espace 2D
+
+                            isChoosingAxis = true;
+                            isCheckingPolygon = true;
+                        }
+                    }
+
                     Debug.Log("Clic à l'extérieur de tous les polygones.");
                 }
             }
@@ -247,7 +269,7 @@ public class PointHandler : MonoBehaviour
         extrusionpath.StartAnimationWithoutRotation(polygonPoints, Path, extrusionpath.segmentCount, currentColor, 5);
     }
 
-    private void CreateExtrusionAxe(List<Vector3> polygonPoints, Transform parent)
+    private void CreateExtrusionAxe(List<Vector3> polygonPoints, Transform parent, Vector3 axis)
     {
         // Create the extrusion object from the prefab
         GameObject extrusionAxe = Instantiate(extrusionAxePrefab);
@@ -258,7 +280,7 @@ public class PointHandler : MonoBehaviour
         // Get the ExtrudeBezier component and update the extrusion
         ExtrusionAxe extrusionaxe = extrusionAxe.GetComponent<ExtrusionAxe>();
         //extrusionaxe.ExtrudeSurAxe(polygonPoints,parent, currentColor);
-        extrusionaxe.StartAnimation(polygonPoints, extrusionaxe.segmentCount, currentColor, 5);
+        extrusionaxe.StartAnimation(polygonPoints, extrusionaxe.segmentCount, axis, currentColor, 1);
     }
     private void CreateAndExtrudeObject(List<Vector3> curvePoints, Transform parent)
     {
