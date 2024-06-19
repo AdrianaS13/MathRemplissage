@@ -48,6 +48,7 @@ public class PointHandler : MonoBehaviour
     [SerializeField] private Image metalBorder;
     [SerializeField] private Image noneBorder;
 
+    private bool curveZwithoutR = false;
 
     void Update()
     {
@@ -80,6 +81,18 @@ public class PointHandler : MonoBehaviour
                 List<Vector3> curvePoints = decasteljauScript.GetCurvePoints(currentPointsZ);
                 CreateExtrusionPath(LastCurvePoints, curvePoints, curveZGameObject.transform);
                 isZCurve = false;
+            }
+            if (Input.GetMouseButtonDown(2) && drawing)
+            {
+                drawing = false; // Arrêter le dessin
+                List<GameObject> currentPointsZ = new List<GameObject>(pointsZ);
+                ConnectPoints(currentPointsZ); // Connecter les points pour former un polygone
+                courbes.Add(currentPointsZ);
+                decasteljauScript.DrawBezierCurve(currentPointsZ, curveZGameObject);
+                List<Vector3> curvePoints = decasteljauScript.GetCurvePoints(currentPointsZ);
+                CreateExtrusionPathWithoutRotation(LastCurvePoints, curvePoints, curveZGameObject.transform);
+                isZCurve = false;
+                curveZwithoutR = false;
             }
         }
         else
@@ -220,6 +233,20 @@ public class PointHandler : MonoBehaviour
         //extrusionpath.ExtrudeAlongCurve(polygonPoints, Path, parent, currentColor);
         extrusionpath.StartAnimation(polygonPoints, Path, extrusionpath.segmentCount, currentColor, 5);
     }
+
+    private void CreateExtrusionPathWithoutRotation(List<Vector3> polygonPoints, List<Vector3> Path, Transform parent)
+    {
+        // Create the extrusion object from the prefab
+        GameObject extrusionPath = Instantiate(extrusionPathPrefab);
+
+        extrusionPath.transform.SetParent(parent.transform);
+        meshes.Add(extrusionPath);
+
+        // Get the ExtrudeBezier component and update the extrusion
+        ExtrusionLongCurve extrusionpath = extrusionPath.GetComponent<ExtrusionLongCurve>();
+        extrusionpath.StartAnimationWithoutRotation(polygonPoints, Path, extrusionpath.segmentCount, currentColor, 5);
+    }
+
     private void CreateExtrusionAxe(List<Vector3> polygonPoints, Transform parent)
     {
         // Create the extrusion object from the prefab
@@ -375,6 +402,10 @@ public class PointHandler : MonoBehaviour
 
     }
 
+    public void ZwithoutR()
+    {
+        curveZwithoutR = true;
+    }
     // Méthode pour vérifier si le pointeur de la souris est sur un objet UI
     bool IsPointerOverUIObject()
     {

@@ -21,7 +21,7 @@ public class ExtrusionLongCurve : MonoBehaviour
             return;
         }
 
-        MeshFilter meshFilter = GetComponent<MeshFilter>(); 
+        MeshFilter meshFilter = GetComponent<MeshFilter>();
         transform.SetParent(parent);
         meshFilter.mesh = CreateExtrudedMesh(shape, path, segmentCount, currentColor);
     }
@@ -93,12 +93,71 @@ public class ExtrusionLongCurve : MonoBehaviour
             Material material = new Material(Shader.Find("Standard"));
             material.mainTexture = texture;
             meshRenderer.material = material;
-        } else
+        }
+        else
         {
             meshRenderer.material.color = currentColor;
         }
         return mesh;
     }
+    public Mesh CreateExtrudedMeshWithoutRotation(List<Vector3> shape, List<Vector3> path, int segments, Color currentColor)
+    {
+        int shapePointCount = shape.Count;
+        int pathPointCount = path.Count;
+        int verticesCount = shapePointCount * pathPointCount;
+
+        Vector3[] vertices = new Vector3[verticesCount];
+        int[] triangles = new int[(shapePointCount - 1) * (pathPointCount - 1) * 6];
+        Vector2[] uvs = new Vector2[verticesCount];
+
+
+        for (int i = 0; i < pathPointCount; i++)
+        {
+            Vector3 pathPoint = path[i];
+
+            for (int j = 0; j < shapePointCount; j++)
+            {
+                Vector3 shapePoint = shape[j];
+                int vertexIndex = i * shapePointCount + j;
+                vertices[vertexIndex] = new Vector3(pathPoint.x + shapePoint.x, pathPoint.y + shapePoint.y, pathPoint.z);
+                uvs[vertexIndex] = new Vector2((float)j / (shapePointCount - 1), (float)i / (pathPointCount - 1));
+            }
+        }
+
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices;
+        mesh.uv = uvs;
+        mesh.triangles = new int[0]; // Initially, no triangles
+        mesh.ManuallyRecalculateNormals();
+        mesh.SetNormals(vertices);
+
+        // Apply the new color to the material
+        if (meshRenderer == null)
+        {
+            meshRenderer = GetComponent<MeshRenderer>();
+        }
+        if (PointHandler.setMaterialWood)
+        {
+            Texture2D texture = Resources.Load<Texture2D>("wood");
+            Material material = new Material(Shader.Find("Standard"));
+            material.mainTexture = texture;
+            meshRenderer.material = material;
+        }
+        else if (PointHandler.setMaterialMetal)
+        {
+            Texture2D texture = Resources.Load<Texture2D>("metal");
+            Material material = new Material(Shader.Find("Standard"));
+            material.mainTexture = texture;
+            meshRenderer.material = material;
+        }
+        else
+        {
+            meshRenderer.material.color = currentColor;
+        }
+
+        return mesh;
+    }
+
 
     void ConfigureLighting()
     {
@@ -112,8 +171,6 @@ public class ExtrusionLongCurve : MonoBehaviour
         // Configurar la posición y rotación de la luz
         lightGameObject.transform.position = new Vector3(0, 10, 0);
         lightGameObject.transform.rotation = Quaternion.Euler(50, -30, 0);
-
-        // Opcional: Configurar más luces y parámetros de iluminación según sea necesario
 
     }
     public IEnumerator AnimateTriangles(Mesh mesh, List<Vector3> shape, List<Vector3> path, int speed)
@@ -157,6 +214,12 @@ public class ExtrusionLongCurve : MonoBehaviour
     public void StartAnimation(List<Vector3> shape, List<Vector3> path, int segments, Color currentColor, int speed)
     {
         Mesh mesh = CreateExtrudedMesh(shape, path, segments, currentColor);
+        GetComponent<MeshFilter>().mesh = mesh;
+        StartCoroutine(AnimateTriangles(mesh, shape, path, speed));
+    }
+    public void StartAnimationWithoutRotation(List<Vector3> shape, List<Vector3> path, int segments, Color currentColor, int speed)
+    {
+        Mesh mesh = CreateExtrudedMeshWithoutRotation(shape, path, segments, currentColor);
         GetComponent<MeshFilter>().mesh = mesh;
         StartCoroutine(AnimateTriangles(mesh, shape, path, speed));
     }
